@@ -21,7 +21,7 @@ dotenv.config();
 const app = express();
 
 // Koneksi ke DB
-connectDB();
+await connectDB();
 
 app.use(cors({
   // origin: 'https://frontend-sdn-tembalang.vercel.app',
