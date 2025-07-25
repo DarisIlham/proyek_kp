@@ -21,11 +21,11 @@ dotenv.config();
 const app = express();
 
 // Koneksi ke DB
-await connectDB();
+connectDB();
 
 app.use(cors({
-  // origin: 'https://frontend-sdn-tembalang.vercel.app',
-  // credentials: true
+  origin: 'https://frontend-sdn-tembalang.vercel.app',
+  credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
