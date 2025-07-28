@@ -23,6 +23,16 @@ const AkademikAdmin = ({ token }) => {
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [selectedEventDetails, setSelectedEventDetails] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const sanitizeInput = (value) => {
+    return value
+      .replace(/<[^>]*>?/gm, "") 
+      .replace(/[<>{}[\]()*&^%$#!]/g, ""); 
+  };
+
+  const handleSearchChange = (e) => {
+    const sanitizedValue = sanitizeInput(e.target.value);
+    setSearchTerm(sanitizedValue);
+  }
 
   const [eventForm, setEventForm] = useState({
     title: "",
@@ -234,7 +244,7 @@ const AkademikAdmin = ({ token }) => {
               type="text"
               placeholder="Cari kegiatan atau acara..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>

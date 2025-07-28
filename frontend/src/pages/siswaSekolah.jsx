@@ -14,6 +14,17 @@ const SiswaSekolah = () => {
 
   const API_URL = `${API_BASE_URL}/api/siswas`;
 
+  const sanitizeInput = (value) => {
+    return value
+      .replace(/<[^>]*>?/gm, "") 
+      .replace(/[<>{}[\]()*&^%$#!]/g, ""); 
+  };
+
+  const handleSearchChange = (e) => {
+    const sanitizedValue = sanitizeInput(e.target.value);
+    setSearchTerm(sanitizedValue);
+  };
+
   // Helper function for HTTP errors
   const handleApiError = async (response) => {
     if (!response.ok) {
@@ -152,7 +163,7 @@ const SiswaSekolah = () => {
             placeholder="Cari siswa..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
 

@@ -10,6 +10,12 @@ const GuruSekolah = () => {
   const [loading, setLoading] = useState(true);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+  const sanitizeInput = (value) => {
+    return value
+      .replace(/<[^>]*>?/gm, "") 
+      .replace(/[<>{}[\]()*&^%$#!]/g, ""); 
+  };
+
   // Fetch teachers from API
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -43,8 +49,9 @@ const GuruSekolah = () => {
   });
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    const sanitizedValue = sanitizeInput(e.target.value);
+    setSearchTerm(sanitizedValue);
+    setCurrentPage(1);
   };
 
   // Pagination
