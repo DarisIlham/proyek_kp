@@ -16,8 +16,23 @@ const LoginPage = () => {
     message: ''
   });
 
+   const sanitizeInput = (value) => {
+    return value
+      .replace(/<[^>]*>?/gm, "") 
+      .replace(/[<>{}[\]()*&^%$#!]/g, ""); 
+  };
+
+  const handleEmailChange = (e) => {
+    const sanitizedValue = sanitizeInput(e.target.value);
+    setEmail(sanitizedValue);
+  }
+
+  const handlePasswordChange = (e) => {
+    const sanitizedValue = sanitizeInput(e.target.value);
+    setPassword(sanitizedValue);
+  }
   const handleRecaptchaChange = (value) => {
-    setIsRecaptchaFilled(!!value); // Akan true jika value ada (reCAPTCHA diisi), false jika tidak
+    setIsRecaptchaFilled(!!value); // captcha
   };
 
   const handleSubmit = async (e) => {
@@ -136,7 +151,7 @@ const LoginPage = () => {
                   autoComplete="off"
                   name="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   required
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="Masukkan username"
@@ -162,7 +177,7 @@ const LoginPage = () => {
                   autoComplete="off"
                   value={password}
                   required
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="Masukkan password"
                 />
