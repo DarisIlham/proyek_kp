@@ -123,7 +123,7 @@ const HeroSection = () => {
             className="order-1 lg:order-1"
             variants={imageVariants}
           >
-            <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden">
+            <div className="bg-gray-200 rounded-lg h-75 md:h-85 lg:h-94 flex items-center justify-center overflow-hidden relative">
               {content.gambar ? (
                 <motion.img
                   src={content.gambar} 
@@ -160,7 +160,7 @@ const HeroSection = () => {
               {content.deskripsi}
             </motion.p>
 
-            <motion.div className="flex flex-col sm:flex-row gap-4">
+            <motion.div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
               <motion.a
                 href="https://spmb.semarangkota.go.id/"
                 target="_blank"

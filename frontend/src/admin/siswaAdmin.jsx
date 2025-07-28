@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Search, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
-  ChevronLeft, 
+import {
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp
-} from 'lucide-react';
+  ChevronUp,
+} from "lucide-react";
 import Header from "../componentsAdmin/components/Header";
 import Footer from "../componentsAdmin/components/Footer";
 const SiswaAdmin = () => {
@@ -21,14 +21,14 @@ const SiswaAdmin = () => {
   const [expandedClasses, setExpandedClasses] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('add');
+  const [modalMode, setModalMode] = useState("add");
   const [currentStudent, setCurrentStudent] = useState({
-    nama: '',
-    kelas: '',
-    nisn: ''
+    nama: "",
+    kelas: "",
+    nisn: "",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
@@ -37,32 +37,33 @@ const SiswaAdmin = () => {
   const API_URL = `${API_BASE_URL}/api/siswas`;
 
   const kelasOptions = [
-    'I-A', 'I-B', 'I-C', 
-    'II-A', 'II-B', 'II-C', 
-    'III-A', 'III-B', 'III-C',
-    'IV-A', 'IV-B', 'IV-C', 
-    'V-A', 'V-B', 'V-C', 
-    'VI-A', 'VI-B', 'VI-C',
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
   ];
 
   // Helper function for HTTP errors
   const handleApiError = async (response) => {
     if (!response.ok) {
       const errorData = await response.json();
-      const errorMsg = errorData.error || 
-                      (errorData.errors ? 
-                       errorData.errors.map(e => e.msg).join(', ') : 
-                       `HTTP error! status: ${response.status}`);
+      const errorMsg =
+        errorData.error ||
+        (errorData.errors
+          ? errorData.errors.map((e) => e.msg).join(", ")
+          : `HTTP error! status: ${response.status}`);
       throw new Error(errorMsg);
     }
     return response.json();
   };
 
   useEffect(() => {
-      if (!token) {
-        navigate("/admin");
-      }
-    }, [token, navigate]);
+    if (!token) {
+      navigate("/admin");
+    }
+  }, [token, navigate]);
 
   // Fetch students
   useEffect(() => {
@@ -73,16 +74,16 @@ const SiswaAdmin = () => {
         const data = await handleApiError(response);
         setStudents(data);
         setFilteredStudents(data);
-        
+
         // Initialize all classes as expanded
         const initialExpanded = {};
-        data.forEach(student => {
+        data.forEach((student) => {
           if (!initialExpanded[student.kelas]) {
             initialExpanded[student.kelas] = true;
           }
         });
         setExpandedClasses(initialExpanded);
-        
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -95,10 +96,11 @@ const SiswaAdmin = () => {
 
   // Filter students based on search term
   useEffect(() => {
-    const filtered = students.filter(student =>
-      student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.kelas.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.nisn.toString().includes(searchTerm)
+    const filtered = students.filter(
+      (student) =>
+        student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.kelas.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.nisn.toString().includes(searchTerm)
     );
     setFilteredStudents(filtered);
   }, [searchTerm, students]);
@@ -117,82 +119,83 @@ const SiswaAdmin = () => {
 
   const studentsByClass = groupStudentsByClass(filteredStudents);
   const sortedClasses = Object.keys(studentsByClass).sort((a, b) => {
-  const [gradeA, classA] = a.split('-');
-  const [gradeB, classB] = b.split('-');
+    const [gradeA, classA] = a.split("-");
+    const [gradeB, classB] = b.split("-");
     const romanToNum = {
-    'I': 1,
-    'II': 2,
-    'III': 3,
-    'IV': 4,
-    'V': 5,
-    'VI': 6
-  };
+      I: 1,
+      II: 2,
+      III: 3,
+      IV: 4,
+      V: 5,
+      VI: 6,
+    };
     if (romanToNum[gradeA] !== romanToNum[gradeB]) {
-    return romanToNum[gradeB] - romanToNum[gradeA];
-  }
+      return romanToNum[gradeB] - romanToNum[gradeA];
+    }
   });
-  
 
   // Toggle expand/collapse for class
   const toggleClass = (kelas) => {
-    setExpandedClasses(prev => ({
+    setExpandedClasses((prev) => ({
       ...prev,
-      [kelas]: !prev[kelas]
+      [kelas]: !prev[kelas],
     }));
   };
 
   // CRUD Operations
   const handleAddStudent = () => {
-    setModalMode('add');
+    setModalMode("add");
     setCurrentStudent({
-      nama: '',
-      kelas: '',
-      nisn: ''
+      nama: "",
+      kelas: "",
+      nisn: "",
     });
     setShowModal(true);
   };
 
   const handleEditStudent = (student) => {
-    setModalMode('edit');
+    setModalMode("edit");
     setCurrentStudent({
       _id: student._id,
       nama: student.nama,
       kelas: student.kelas,
-      nisn: student.nisn
+      nisn: student.nisn,
     });
     setShowModal(true);
   };
 
   const handleSaveStudent = async () => {
     if (!currentStudent.nama || !currentStudent.kelas || !currentStudent.nisn) {
-      alert('Semua field harus diisi!');
+      alert("Semua field harus diisi!");
       return;
     }
 
     try {
       let response;
       const headers = {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       };
 
-      if (modalMode === 'add') {
+      if (modalMode === "add") {
         response = await fetch(API_URL, {
-          method: 'POST',
+          method: "POST",
           headers,
-          body: JSON.stringify(currentStudent)
+          body: JSON.stringify(currentStudent),
         });
         const newStudent = await handleApiError(response);
         setStudents([...students, newStudent]);
       } else {
         response = await fetch(`${API_URL}/${currentStudent._id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers,
-          body: JSON.stringify(currentStudent)
+          body: JSON.stringify(currentStudent),
         });
         const updatedStudent = await handleApiError(response);
-        setStudents(students.map(student => 
-          student._id === currentStudent._id ? updatedStudent : student
-        ));
+        setStudents(
+          students.map((student) =>
+            student._id === currentStudent._id ? updatedStudent : student
+          )
+        );
       }
       setShowModal(false);
     } catch (err) {
@@ -208,9 +211,11 @@ const SiswaAdmin = () => {
   const confirmDeleteStudent = async () => {
     try {
       await fetch(`${API_URL}/${studentToDelete._id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
-      setStudents(students.filter(student => student._id !== studentToDelete._id));
+      setStudents(
+        students.filter((student) => student._id !== studentToDelete._id)
+      );
       setShowDeleteConfirm(false);
       setStudentToDelete(null);
     } catch (err) {
@@ -234,8 +239,8 @@ const SiswaAdmin = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center text-red-500">
           <p>Error: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Coba Lagi
@@ -245,14 +250,14 @@ const SiswaAdmin = () => {
     );
   }
 
-   if (!token) {
-    return null; 
+  if (!token) {
+    return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Header/>
+      <Header />
 
       {/* Main Content */}
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -280,14 +285,17 @@ const SiswaAdmin = () => {
         {/* Students Grouped by Class */}
         <div className="space-y-6">
           {sortedClasses.map((kelas) => (
-            <div key={kelas} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div 
+            <div
+              key={kelas}
+              className="bg-white rounded-lg shadow-md overflow-hidden"
+            >
+              <div
                 className="bg-blue-50 px-6 py-3 border-b border-blue-100 flex justify-between items-center cursor-pointer hover:bg-blue-100 transition-colors"
                 onClick={() => toggleClass(kelas)}
               >
                 <div className="flex items-center">
                   <h3 className="text-lg font-semibold text-blue-800 mr-3">
-                    Kelas {kelas} 
+                    Kelas {kelas}
                   </h3>
                   <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
                     {studentsByClass[kelas].length} siswa
@@ -299,16 +307,24 @@ const SiswaAdmin = () => {
                   <ChevronDown className="w-5 h-5 text-blue-600" />
                 )}
               </div>
-              
+
               {expandedClasses[kelas] && (
                 <div className="overflow-x-auto">
                   <table className="w-full table-fixed">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">NISN</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Aksi</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Nama
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          NISN
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          Aksi
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -317,7 +333,10 @@ const SiswaAdmin = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-12">
                             {index + 1}
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900 truncate" title={student.nama}>
+                          <td
+                            className="px-6 py-4 text-sm font-medium text-gray-900 truncate"
+                            title={student.nama}
+                          >
                             {student.nama}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/4">
@@ -353,7 +372,9 @@ const SiswaAdmin = () => {
           {/* Empty State */}
           {filteredStudents.length === 0 && (
             <div className="text-center py-12 bg-white rounded-lg shadow">
-              <p className="text-gray-500">Tidak ada data siswa yang ditemukan.</p>
+              <p className="text-gray-500">
+                Tidak ada data siswa yang ditemukan.
+              </p>
             </div>
           )}
         </div>
@@ -365,7 +386,7 @@ const SiswaAdmin = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">
-                {modalMode === 'add' ? 'Tambah Siswa' : 'Edit Siswa'}
+                {modalMode === "add" ? "Tambah Siswa" : "Edit Siswa"}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -383,7 +404,12 @@ const SiswaAdmin = () => {
                 <input
                   type="text"
                   value={currentStudent.nama}
-                  onChange={(e) => setCurrentStudent({...currentStudent, nama: e.target.value})}
+                  onChange={(e) =>
+                    setCurrentStudent({
+                      ...currentStudent,
+                      nama: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Masukkan nama siswa"
                 />
@@ -395,14 +421,40 @@ const SiswaAdmin = () => {
                 </label>
                 <select
                   value={currentStudent.kelas}
-                  onChange={(e) => setCurrentStudent({...currentStudent, kelas: e.target.value})}
+                  onChange={(e) =>
+                    setCurrentStudent({
+                      ...currentStudent,
+                      kelas: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Pilih kelas</option>
-                  {kelasOptions.map(kelas => (
-                    <option key={kelas} value={kelas}>{kelas}</option>
+                  {kelasOptions.map((kelas) => (
+                    <option key={kelas} value={kelas}>
+                      {kelas}
+                    </option>
                   ))}
+                  <option value="lainnya">Lainnya...</option>
                 </select>
+
+                {currentStudent.kelas === "lainnya" && (
+                  <input
+                    type="text"
+                    placeholder="Masukkan kelas lainnya (contoh: I-A)"
+                    value={currentStudent.kelasLainnya || ""}
+                    onChange={(e) => {
+                      const formatted = e.target.value
+                        .replace(/\s+/g, "")
+                        .toUpperCase();
+                      setCurrentStudent({
+                        ...currentStudent,
+                        kelasLainnya: formatted,
+                      });
+                    }}
+                    className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
               </div>
 
               <div>
@@ -412,7 +464,12 @@ const SiswaAdmin = () => {
                 <input
                   type="text"
                   value={currentStudent.nisn}
-                  onChange={(e) => setCurrentStudent({...currentStudent, nisn: e.target.value})}
+                  onChange={(e) =>
+                    setCurrentStudent({
+                      ...currentStudent,
+                      nisn: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Masukkan NISN"
                 />
@@ -444,8 +501,9 @@ const SiswaAdmin = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Konfirmasi Hapus</h2>
             <p className="text-gray-600 mb-6">
-              Apakah Anda yakin ingin menghapus siswa <strong>{studentToDelete?.nama}</strong>?
-              Tindakan ini tidak dapat dibatalkan.
+              Apakah Anda yakin ingin menghapus siswa{" "}
+              <strong>{studentToDelete?.nama}</strong>? Tindakan ini tidak dapat
+              dibatalkan.
             </p>
             <div className="flex justify-end gap-2">
               <button

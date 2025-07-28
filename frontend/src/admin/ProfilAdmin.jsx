@@ -410,7 +410,7 @@ const ProfilAdmin = () => {
           <div className="max-w-6xl mx-auto">
             <div className="bg-blue-900 text-white py-4 px-6 rounded-t-lg flex items-center justify-between">
               <h2 className="text-2xl font-bold">
-                Tujuan Sekolah Pada Tahun 2017 Diharapkan:
+                Tujuan Sekolah 
               </h2>
               {!editMode.tujuan ? (
                 <button
@@ -497,7 +497,7 @@ const ProfilAdmin = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="bg-blue-900 text-white py-4 px-6 rounded-t-lg flex items-center justify-between">
-              <h2 className="text-2xl font-bold">STRATEGI</h2>
+              <h2 className="text-2xl font-bold">Strategi</h2>
               {!editMode.strategi ? (
                 <button
                   onClick={() => handleEdit("strategi")}

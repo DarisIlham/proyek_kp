@@ -284,7 +284,7 @@ const HeroSection = () => {
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           >
-            <div className="bg-gray-200 rounded-lg h-94 flex items-center justify-center overflow-hidden relative">
+            <div className="bg-gray-200 rounded-lg h-75 md:h-85 lg:h-94 flex items-center justify-center overflow-hidden relative">
               {content.gambar ? (
                 <>
                   <motion.img
@@ -340,7 +340,7 @@ const HeroSection = () => {
             </motion.p>
 
             <motion.div 
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start"
               variants={itemVariants}
             >
               <motion.a
@@ -359,7 +359,7 @@ const HeroSection = () => {
               {localStorage.getItem("token") && (
                 <motion.button
                   onClick={handleEdit}
-                  className="bg-gray-600 text-white px-8 py-3 rounded-lg hover:bg-gray-700 text-lg font-semibold"
+                  className="bg-gray-600 text-white px-8 py-3 rounded-lg w-49 hover:bg-gray-700 text-lg font-semibold shadow-md"
                   whileHover="hover"
                   whileTap="tap"
                   variants={buttonVariants}

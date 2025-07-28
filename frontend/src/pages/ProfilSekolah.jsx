@@ -145,7 +145,7 @@ const ProfilSekolah = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="bg-blue-900 text-white py-4 px-6 rounded-t-lg">
-              <h2 className="text-2xl font-bold text-center">STRATEGI</h2>
+              <h2 className="text-2xl font-bold text-center">Strategi</h2>
             </div>
             
             <div className="bg-white p-8 rounded-b-lg shadow-md border border-gray-200">
