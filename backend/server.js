@@ -43,4 +43,8 @@ app.listen(PORT, () => {
   console.log("\nKontak Routes:"); 
   console.log("- GET    /api/kontak");
   console.log("- POST   /api/kontak");
+
+  console.log("\nSlider Routes:"); 
+  console.log("- GET    /api/slider");
+  console.log("- POST   /api/slider");
 });

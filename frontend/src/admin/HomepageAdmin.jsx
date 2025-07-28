@@ -8,6 +8,7 @@ import AboutSection from "../componentsAdmin/components/AboutSection";
 import NewsSection from "../componentsAdmin/components/NewsSection";
 import GallerySection from "../componentsAdmin/components/GallerySection";
 import JumlahSiswa from "../componentsAdmin/components/JumlahSiswa";
+import Slider from "../componentsAdmin/components/Slider";
 
 const App = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
+      <Slider />
       <HeroSection />
       <JumlahSiswa />
       <FeaturesSection />
