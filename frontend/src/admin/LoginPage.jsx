@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { User, Lock, Eye, EyeOff, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const [isRecaptchaFilled, setIsRecaptchaFilled] = useState(false);
+
+  const handleRecaptchaChange = (value) => {
+    setIsRecaptchaFilled(!!value); // Akan true jika value ada (reCAPTCHA diisi), false jika tidak
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,10 +135,19 @@ const LoginPage = () => {
               </div>
             )}
 
+            <ReCAPTCHA
+              sitekey="6LfRLZErAAAAACX5wyaa_95nnMhR-CKPYcIMBUOJ"
+              onChange={handleRecaptchaChange}
+            />
+
             {/* Login Button */}
-           <div
-              onClick={handleSubmit}
-              className="bg-blue-600 hover:bg-blue-700 w-full flex justify-center py-3 px-4 border border-white rounded-lg shadow-sm text-lg font-semibold text-white transition-all duration-200 cursor-pointer"
+            <div
+              onClick={isRecaptchaFilled ? handleSubmit : null}
+              className={`w-full flex justify-center py-3 px-4 border rounded-lg shadow-sm text-lg font-semibold transition-all duration-200 cursor-pointer ${
+                isRecaptchaFilled
+                  ? "bg-blue-600 hover:bg-blue-700 border-white text-white"
+                  : "bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed"
+              }`}
             >
               Login
             </div>
