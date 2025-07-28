@@ -11,10 +11,6 @@ const NewsSection = () => {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const getAuthToken = () => {
-    return localStorage.getItem('token');
-  };
-
   useEffect(() => {
     const fetchHeader = async () => {
       try {
@@ -33,10 +29,7 @@ const NewsSection = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const token = getAuthToken();
-        const response = await fetch(`${API_BASE_URL}/api/berita`, {
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
+        const response = await fetch(`${API_BASE_URL}/api/berita`);
 
         if (!response.ok) {
           const text = await response.text();

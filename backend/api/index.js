@@ -1,7 +1,7 @@
-import app from "../app.js"; // file utama Express-mu
-import { createServer } from "http";
+// api/index.js
+import app from '../app.js';
 
 export default function handler(req, res) {
-  const server = createServer(app);
-  server.emit("request", req, res);
+  console.log(`[${req.method}] ${req.url}`);
+  app(req, res);
 }

@@ -5,8 +5,6 @@ import { Home, Users, BookOpen, Image, Settings, LogOut, Menu, Bell, ChevronLeft
 const DetailBerita = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token"); 
-
   const [berita, setBerita] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,17 +32,11 @@ const DetailBerita = () => {
         }, []);
 
 useEffect(() => {
-    if (!token) {
-      navigate("/admin");
-      return;
-    }
-
     const fetchBerita = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/berita/${id}`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -61,11 +53,7 @@ useEffect(() => {
     };
 
     fetchBerita();
-  }, [id, navigate, token]); 
-
-  if (!token) {
-    return null;
-  }
+  }, [id, navigate]); 
 
   if (loading) return <div className="text-center py-12">Memuat...</div>;
   if (error) return <div className="text-center py-12 text-red-500">{error}</div>;

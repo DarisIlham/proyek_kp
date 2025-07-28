@@ -66,7 +66,6 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-6">Jelajah</h3>
             <ul className="space-y-2 text-blue-200">
-              <li><a href="#" className="hover:text-white transition-colors duration-200">Sambutan</a></li>
               <li><a href="/profil" className="cursor-pointer hover:text-white transition-colors duration-200">Profil Sekolah</a></li>
               <li><a href="/berita" className="cursor-pointer hover:text-white transition-colors duration-200">Berita</a></li>
             </ul>
