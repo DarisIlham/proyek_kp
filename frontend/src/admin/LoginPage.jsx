@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Lock, Eye, EyeOff, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -11,6 +11,10 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [isRecaptchaFilled, setIsRecaptchaFilled] = useState(false);
+  const [errorNotification, setErrorNotification] = useState({
+    show: false,
+    message: ''
+  });
 
   const handleRecaptchaChange = (value) => {
     setIsRecaptchaFilled(!!value); // Akan true jika value ada (reCAPTCHA diisi), false jika tidak
@@ -18,7 +22,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrorNotification({ show: false, message: '' });
 
     try {
       // Step 1: Login
@@ -32,8 +36,7 @@ const LoginPage = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert("Login failed: " + errorData.message);
-        return;
+        throw new Error("Gagal masuk: " + errorData.message);
       }
 
       const data = await res.json();
@@ -44,9 +47,21 @@ const LoginPage = () => {
 
       navigate("/homeadmin");
     } catch (error) {
-      alert("Error connecting to server: " + error.message);
+      setErrorNotification({
+      show: true,
+      message: error.message
+    });
     }
   };
+
+  useEffect(() => {
+    if (errorNotification.show) {
+      const timer = setTimeout(() => {
+        setErrorNotification({ show: false, message: "" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorNotification.show]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -61,6 +76,45 @@ const LoginPage = () => {
             Masuk ke Dashboard Admin Sekolah
           </p>
         </div>
+
+        {errorNotification.show && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="px-6 py-4 rounded-lg shadow-lg flex items-center space-x-4 bg-red-500 text-white animate-fade-in-up">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            <span>{errorNotification.message}</span>
+            <button
+              onClick={() => setErrorNotification({ show: false, message: "" })}
+              className="ml-4 text-white hover:text-gray-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
         {/* Login Form */}
         <div className="bg-white rounded-xl shadow-2xl p-8 space-y-6">
