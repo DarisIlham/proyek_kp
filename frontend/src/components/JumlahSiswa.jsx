@@ -12,11 +12,23 @@ const Jumlah = () => {
         if (!response.ok) throw new Error('Failed to fetch stats');
         const data = await response.json();
 
+        // Fetch data siswa
+        const siswaResponse = await fetch(`${API_BASE_URL}/api/siswas`);
+        if (!siswaResponse.ok) throw new Error('Failed to fetch siswa data');
+        const siswaData = await siswaResponse.json();
+        const jumlahSiswa = siswaData.length;
+
+        // Fetch data guru
+        const guruResponse = await fetch(`${API_BASE_URL}/api/gurus`);
+        if (!guruResponse.ok) throw new Error('Failed to fetch guru data');
+        const guruData = await guruResponse.json();
+        const jumlahGuru = guruData.length;
+
         setStats({
-          namajumlah1: data.namajumlah1 || '',
-          jumlah1: data.jumlah1 || 0,
-          namajumlah2: data.namajumlah2 || '',
-          jumlah2: data.jumlah2 || 0,
+          namajumlah1: 'Jumlah Siswa',
+          jumlah1: jumlahSiswa,
+          namajumlah2: 'Jumlah Guru',
+          jumlah2: jumlahGuru,
           namajumlah3: data.namajumlah3 || '',
           jumlah3: data.jumlah3 || 0,
           nama: data.judul || ""

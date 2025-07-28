@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { BookOpen, Users, Wrench, Trophy, Edit, X, Check, Loader2 } from 'lucide-react';
 import { motion, useInView } from 'framer-motion'; 
 
+
 const FeatureSection = () => {
   const [features, setFeatures] = useState({
     judulfeature: "",
@@ -21,6 +22,7 @@ const FeatureSection = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const [showNotification, setShowNotification] = useState(false);
 
   // 👀 Ref dan scroll trigger
   const sectionRef = useRef(null);
@@ -108,8 +110,13 @@ const FeatureSection = () => {
         feature4: data.feature4,
         deskripsifeature4: data.deskripsifeature4
       });
-      alert('Features updated successfully!');
+      setMessage("Data berhasil diperbaharui");
+      setShowNotification(true);
       setIsEditing(false);
+
+      setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -201,7 +208,7 @@ const FeatureSection = () => {
             </div>
           )}
           {error && <p className="text-red-600 mt-2">{error}</p>}
-          {message && <p className="text-green-600 mt-2">{message}</p>}
+          {message && <p className="text-green-600 mt-2">{}</p>}
         </div>
 
         <motion.div
@@ -250,6 +257,27 @@ const FeatureSection = () => {
           ))}
         </motion.div>
       </div>
+      {showNotification && (
+        <div className="fixed bottom-4 right-4">
+          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span>{message}</span>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
