@@ -127,7 +127,7 @@ const Slider = () => {
 
   return (
     <div 
-      className="relative w-full h-[200px] md:h-[500px] lg:h-[675px] overflow-hidden"
+      className="relative w-full h-[400px] md:h-[500px] lg:h-[675px] overflow-hidden"
       onPointerEnter={() => setIsHovered(true)}
       onPointerLeave={() => setIsHovered(false)}
     >
