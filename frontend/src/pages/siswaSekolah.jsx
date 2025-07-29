@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -8,16 +8,14 @@ const SiswaSekolah = () => {
   const [expandedClasses, setExpandedClasses] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredStudents, setFilteredStudents] = useState([]);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const API_URL = `${API_BASE_URL}/api/siswas`;
 
   const sanitizeInput = (value) => {
-    return value
-      .replace(/<[^>]*>?/gm, "") 
-      .replace(/[<>{}[\]()*&^%$#!]/g, ""); 
+    return value.replace(/<[^>]*>?/gm, "").replace(/[<>{}[\]()*&^%$#!]/g, "");
   };
 
   const handleSearchChange = (e) => {
@@ -29,10 +27,11 @@ const SiswaSekolah = () => {
   const handleApiError = async (response) => {
     if (!response.ok) {
       const errorData = await response.json();
-      const errorMsg = errorData.error || 
-                     (errorData.errors ? 
-                      errorData.errors.map(e => e.msg).join(', ') : 
-                      `HTTP error! status: ${response.status}`);
+      const errorMsg =
+        errorData.error ||
+        (errorData.errors
+          ? errorData.errors.map((e) => e.msg).join(", ")
+          : `HTTP error! status: ${response.status}`);
       throw new Error(errorMsg);
     }
     return response.json();
@@ -47,16 +46,16 @@ const SiswaSekolah = () => {
         const data = await handleApiError(response);
         setStudents(data);
         setFilteredStudents(data);
-        
+
         // Initialize all classes as expanded
         const initialExpanded = {};
-        data.forEach(student => {
+        data.forEach((student) => {
           if (!initialExpanded[student.kelas]) {
             initialExpanded[student.kelas] = true;
           }
         });
         setExpandedClasses(initialExpanded);
-        
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -69,10 +68,11 @@ const SiswaSekolah = () => {
 
   // Filter students based on search term
   useEffect(() => {
-    const filtered = students.filter(student =>
-      student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.kelas.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.nisn.toString().includes(searchTerm)
+    const filtered = students.filter(
+      (student) =>
+        student.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.kelas.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.nisn.toString().includes(searchTerm)
     );
     setFilteredStudents(filtered);
   }, [searchTerm, students]);
@@ -91,26 +91,33 @@ const SiswaSekolah = () => {
 
   const studentsByClass = groupStudentsByClass(filteredStudents);
   const sortedClasses = Object.keys(studentsByClass).sort((a, b) => {
-    const [gradeA, classA] = a.split('-');
-    const [gradeB, classB] = b.split('-');
+    const partsA = a.split("-");
+    const partsB = b.split("-");
+    const gradeA = partsA[0]?.trim() || "";
+    const classA = partsA[1]?.trim() || "";
+    const gradeB = partsB[0]?.trim() || "";
+    const classB = partsB[1]?.trim() || "";
     const romanToNum = {
       I: 1,
       II: 2,
       III: 3,
       IV: 4,
       V: 5,
-      VI: 6
+      VI: 6,
     };
-    if (romanToNum[gradeA] !== romanToNum[gradeB]) {
-      return romanToNum[gradeA] - romanToNum[gradeB];
+    const gradeComparison =
+      (romanToNum[gradeA] || 0) - (romanToNum[gradeB] || 0);
+    if (gradeComparison !== 0) {
+      return gradeComparison;
     }
+    return (classA || "").localeCompare(classB || "");
   });
 
   // Toggle expand/collapse for class
   const toggleClass = (kelas) => {
-    setExpandedClasses(prev => ({
+    setExpandedClasses((prev) => ({
       ...prev,
-      [kelas]: !prev[kelas]
+      [kelas]: !prev[kelas],
     }));
   };
 
@@ -130,8 +137,8 @@ const SiswaSekolah = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center text-red-500">
           <p>Error: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Coba Lagi
@@ -144,7 +151,7 @@ const SiswaSekolah = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Header/>
+      <Header />
 
       {/* Main Content */}
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -169,14 +176,17 @@ const SiswaSekolah = () => {
         {/* Students Grouped by Class */}
         <div className="space-y-6">
           {sortedClasses.map((kelas) => (
-            <div key={kelas} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div 
+            <div
+              key={kelas}
+              className="bg-white rounded-lg shadow-md overflow-hidden"
+            >
+              <div
                 className="bg-blue-50 px-6 py-3 border-b border-blue-100 flex justify-between items-center cursor-pointer hover:bg-blue-100 transition-colors"
                 onClick={() => toggleClass(kelas)}
               >
                 <div className="flex items-center">
                   <h3 className="text-lg font-semibold text-blue-800 mr-3">
-                    Kelas {kelas} 
+                    Kelas {kelas}
                   </h3>
                   <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
                     {studentsByClass[kelas].length} siswa
@@ -188,38 +198,46 @@ const SiswaSekolah = () => {
                   <ChevronDown className="w-5 h-5 text-blue-600" />
                 )}
               </div>
-              
+
               {expandedClasses[kelas] && (
                 <div className="overflow-x-auto">
-  <table className="w-full">
-    <thead className="bg-gray-50">
-      <tr>
-        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No</th>
-        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Kelas</th>
-        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">NISN</th>
-      </tr>
-    </thead>
-    <tbody className="bg-white divide-y divide-gray-200">
-      {studentsByClass[kelas].map((student, index) => (
-        <tr key={student._id} className="hover:bg-gray-50">
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-12 text-center">
-            {index + 1}
-          </td>
-          <td className="px-6 py-4 text-sm font-medium text-gray-900">
-            {student.nama}
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-24 text-center">
-            {student.kelas}
-          </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-32 text-center">
-            {student.nisn}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Nama
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                          Kelas
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                          NISN
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {studentsByClass[kelas].map((student, index) => (
+                        <tr key={student._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-12 text-center">
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            {student.nama}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-24 text-center">
+                            {student.kelas}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-32 text-center">
+                            {student.nisn}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           ))}
@@ -227,7 +245,9 @@ const SiswaSekolah = () => {
           {/* Empty State */}
           {filteredStudents.length === 0 && (
             <div className="text-center py-12 bg-white rounded-lg shadow">
-              <p className="text-gray-500">Tidak ada data siswa yang ditemukan.</p>
+              <p className="text-gray-500">
+                Tidak ada data siswa yang ditemukan.
+              </p>
             </div>
           )}
         </div>

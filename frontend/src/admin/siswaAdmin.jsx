@@ -119,8 +119,12 @@ const SiswaAdmin = () => {
 
   const studentsByClass = groupStudentsByClass(filteredStudents);
   const sortedClasses = Object.keys(studentsByClass).sort((a, b) => {
-    const [gradeA, classA] = a.split("-");
-    const [gradeB, classB] = b.split("-");
+    const partsA = a.split("-");
+    const partsB = b.split("-");
+    const gradeA = partsA[0]?.trim() || "";
+    const classA = partsA[1]?.trim() || "";
+    const gradeB = partsB[0]?.trim() || "";
+    const classB = partsB[1]?.trim() || "";
     const romanToNum = {
       I: 1,
       II: 2,
@@ -129,9 +133,12 @@ const SiswaAdmin = () => {
       V: 5,
       VI: 6,
     };
-    if (romanToNum[gradeA] !== romanToNum[gradeB]) {
-      return romanToNum[gradeB] - romanToNum[gradeA];
+    const gradeComparison =
+      (romanToNum[gradeA] || 0) - (romanToNum[gradeB] || 0);
+    if (gradeComparison !== 0) {
+      return gradeComparison;
     }
+    return (classA || "").localeCompare(classB || "");
   });
 
   // Toggle expand/collapse for class
