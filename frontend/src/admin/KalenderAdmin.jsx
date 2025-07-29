@@ -29,6 +29,10 @@ const AkademikAdmin = () => {
   const [academicEvents, setAcademicEvents] = useState([]);
   const [showEventDetails, setShowEventDetails] = useState(false);
   const [selectedEventDetails, setSelectedEventDetails] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [deleteEventId, setDeleteEventId] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Navigation handlers
@@ -162,31 +166,44 @@ const AkademikAdmin = () => {
     setShowEventModal(true);
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus kegiatan ini?")) {
+  const handleDeleteEvent = (eventId) => {
+  setDeleteEventId(eventId);
+  setShowDeleteConfirm(true);
+  setDeleteError(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteEventId) return;
+    setDeleteLoading(true);
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/calendar/${eventId}`,
+          `${API_BASE_URL}/api/calendar/${deleteEventId}`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           }
         );
 
         if (!response.ok) throw new Error("Failed to delete event");
 
         setAcademicEvents(
-          academicEvents.filter((event) => event._id !== eventId)
+          academicEvents.filter((event) => event._id !== deleteEventId)
         );
+        setShowDeleteConfirm(false);
       } catch (error) {
         console.error("Error deleting event:", error);
-        alert("Gagal menghapus kegiatan");
+        setDeleteEventId(null);
+        setDeleteError("Gagal menghapus kegiatan");
+      } finally {
+        setDeleteLoading(false);
       }
-    }
   };
 
   const handleSaveEvent = async () => {
     if (!eventForm.title || !eventForm.date) {
-      alert("Mohon lengkapi semua field yang wajib diisi");
+      alert("Mohon lengkapi semua field yang wajib diisi"); // ganti pop up disini
       return;
     }
 
@@ -708,8 +725,66 @@ const AkademikAdmin = () => {
       </div>
     )}
 
+    {showDeleteConfirm && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-900">Konfirmasi Hapus</h3>
+        <button
+          onClick={() => {
+            setShowDeleteConfirm(false);
+            setDeleteEventId(null);
+          }}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
 
-      {/* Activity Modal */}
+      <div className="mb-6">
+        <p className="text-gray-700">
+          Apakah Anda yakin ingin menghapus kegiatan ini? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        {deleteError && (
+          <p className="mt-2 text-red-600 text-sm">{deleteError}</p>
+        )}
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => {
+            setShowDeleteConfirm(false);
+            setDeleteEventId(null);
+          }}
+          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          disabled={deleteLoading}
+        >
+          Batal
+        </button>
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+          disabled={deleteLoading}
+        >
+          {deleteLoading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Menghapus...
+            </>
+          ) : (
+            <>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Hapus
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Footer */}
       <Footer />

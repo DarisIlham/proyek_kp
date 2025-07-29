@@ -30,6 +30,10 @@ const BeritaAdmin = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [beritaToDelete, setBeritaToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
   // const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [selectedBerita, setSelectedBerita] = useState(null); // For showing full article
   const getAuthToken = () => {
@@ -100,7 +104,7 @@ const BeritaAdmin = () => {
   }, [navigate, fetchBeritas]);
 
 
-  // Handle input changes
+  // Metode pengisian
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -109,7 +113,7 @@ const BeritaAdmin = () => {
     });
   };
 
-  // Handle image URL change
+  // Metode attach foto
   const handleImageUrlChange = (e) => {
     const value = e.target.value;
     setFormData({
@@ -119,10 +123,7 @@ const BeritaAdmin = () => {
     setImagePreview(value);
   };
 
-  // Handle file upload with base64
-  
-
-  // Handle upload method change
+  // Metode upload
   const handleUploadMethodChange = (method) => {
     setUploadMethod(method);
     setImagePreview(null);
@@ -258,15 +259,21 @@ const BeritaAdmin = () => {
     setShowForm(true);
   };
 
-  // Handle delete
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this news?")) return;
+  const handleDeleteClick = (id) => {
+  setBeritaToDelete(id);
+  setShowDeleteModal(true);
+  setDeleteError(null);
+  };
 
+  // Handle delete
+  const confirmDelete = async () => {
+    if (!beritaToDelete) return;
+    setDeleteLoading(true);
     try {
       const token = getAuthToken();
       if (!token) throw new Error('No authentication token found');
       
-      const response = await fetch(`${API_BASE_URL}/api/berita/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/berita/${beritaToDelete}`, {
         method: "DELETE",
         headers: {
           'Authorization': `Bearer ${token}`
@@ -275,10 +282,14 @@ const BeritaAdmin = () => {
 
       if (!response.ok) throw new Error("Failed to delete news");
 
-      setBeritas(beritas.filter((item) => item.id_berita !== id));
+      setBeritas(beritas.filter((item) => item.id_berita !== beritaToDelete));
+      setShowDeleteModal(false);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      console.error("Tidak bisa menghapus berita:", err);
+      setDeleteError(err.message || "Gagal menghapus berita.");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -544,7 +555,7 @@ const BeritaAdmin = () => {
                   <button
                     onClick={() => {
                       setSelectedBerita(null);
-                      handleDelete(selectedBerita.id_berita);
+                      handleDeleteClick(selectedBerita.id_berita);
                     }}
                     className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition-colors duration-200"
                   >
@@ -584,7 +595,7 @@ const BeritaAdmin = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(featuredArticle.id_berita);
+                    handleDeleteClick(featuredArticle.id_berita);
                   }}
                   className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors duration-200"
                 >
@@ -654,7 +665,7 @@ const BeritaAdmin = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(berita.id_berita);
+                      handleDeleteClick(berita.id_berita);
                     }}
                     className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors duration-200"
                   >
@@ -703,6 +714,72 @@ const BeritaAdmin = () => {
           )}
         </section>
       </main>
+
+      {showDeleteModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-900">Konfirmasi Hapus Berita</h3>
+        <button
+          onClick={() => {
+            setShowDeleteModal(false);
+            setBeritaToDelete(null);
+          }}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-gray-700">
+          Apakah Anda yakin ingin menghapus berita ini? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        {deleteError && (
+          <p className="mt-2 text-red-600 text-sm">{deleteError}</p>
+        )}
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => {
+            setShowDeleteModal(false);
+            setBeritaToDelete(null);
+          }}
+          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          disabled={deleteLoading}
+        >
+          Batal
+        </button>
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+          disabled={deleteLoading}
+        >
+          {deleteLoading ? (
+            <>
+              <svg 
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Menghapus...
+            </>
+          ) : (
+            <>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Hapus
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Footer */}
       <Footer />
