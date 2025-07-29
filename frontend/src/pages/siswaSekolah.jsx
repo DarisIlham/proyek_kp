@@ -94,17 +94,16 @@ const SiswaSekolah = () => {
     const [gradeA, classA] = a.split('-');
     const [gradeB, classB] = b.split('-');
     const romanToNum = {
-      'I': 1,
-      'II': 2,
-      'III': 3,
-      'IV': 4,
-      'V': 5,
-      'VI': 6
+      I: 1,
+      II: 2,
+      III: 3,
+      IV: 4,
+      V: 5,
+      VI: 6
     };
     if (romanToNum[gradeA] !== romanToNum[gradeB]) {
       return romanToNum[gradeA] - romanToNum[gradeB];
     }
-    return classA.localeCompare(classB);
   });
 
   // Toggle expand/collapse for class
