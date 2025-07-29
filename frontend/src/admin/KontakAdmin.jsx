@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Trash2, Search } from "lucide-react";
+import { Trash2, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "../componentsAdmin/components/Header";
 import Footer from "../componentsAdmin/components/Footer";
@@ -33,6 +33,10 @@ const KontakAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredFeedbacks, setFilteredFeedbacks] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [feedbackToDelete, setFeedbackToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     if (!token) {
@@ -65,15 +69,26 @@ const KontakAdmin = () => {
     setFilteredFeedbacks(results);
   }, [searchTerm, feedbacks]);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus feedback ini?")) {
+  const handleDeleteClick = (id) => {
+    setFeedbackToDelete(id);
+    setShowDeleteModal(true);
+    setDeleteError(null);
+  }
+
+  const confirmDelete = async () => {
+    if (!feedbackToDelete) return;
+
+    setDeleteLoading(true);
       try {
-        await deleteFeedback(id);
-        setFeedbacks(feedbacks.filter((feedback) => feedback._id !== id));
+        await deleteFeedback(feedbackToDelete);
+        setFeedbacks(feedbacks.filter((feedback) => feedback._id !== feedbackToDelete));
+        setShowDeleteModal(false);
       } catch (error) {
         console.error("Failed to delete feedback:", error);
+        setDeleteError('Gagal menghapus feedback ini, silahkan coba lagi.');
+      } finally {
+        setDeleteLoading(false);
       }
-    }
   };
 
    if (!token) {
@@ -184,7 +199,7 @@ const KontakAdmin = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
-                            onClick={() => handleDelete(feedback._id)}
+                            onClick={() => handleDeleteClick(feedback._id)}
                             className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded"
                             title="Hapus Feedback"
                           >
@@ -207,6 +222,66 @@ const KontakAdmin = () => {
           )}
         </div>
       </section>
+
+      {showDeleteModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-900">Konfirmasi Hapus</h3>
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-gray-700">
+          Apakah Anda yakin ingin menghapus feedback ini? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        {deleteError && (
+          <p className="mt-2 text-red-600 text-sm">{deleteError}</p>
+        )}
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          disabled={deleteLoading}
+        >
+          Batal
+        </button>
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+          disabled={deleteLoading}
+        >
+          {deleteLoading ? (
+            <>
+              <svg 
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Menghapus...
+            </>
+          ) : (
+            <>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Hapus
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Footer */}
       <Footer />
